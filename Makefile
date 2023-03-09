@@ -12,7 +12,7 @@ build:
 
 .PHONY: fmt
 fmt:
-	go fmt
+	go fmt ./...
 
 .PHONY: clean
 clean:
