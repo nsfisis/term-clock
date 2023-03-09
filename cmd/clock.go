@@ -4,109 +4,14 @@ import (
 	"log"
 	"time"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/spf13/cobra"
+
+	"github.com/nsfisis/term-clock/internal/term"
 )
 
-func drawSquare(scr tcell.Screen, xOffset, yOffset, w, h int, style tcell.Style) {
-	for dx := 0; dx < w; dx++ {
-		x := xOffset + dx
-		for dy := 0; dy < h; dy++ {
-			y := yOffset + dy
-			scr.SetContent(x, y, ' ', nil, style)
-		}
-	}
-}
-
-func drawNumber(scr tcell.Screen, n, xOffset, yOffset, squareW, squareH int, style tcell.Style) {
-	defs := [...][15]bool{
-		{
-			true, true, true,
-			true, false, true,
-			true, false, true,
-			true, false, true,
-			true, true, true,
-		},
-		{
-			false, false, true,
-			false, false, true,
-			false, false, true,
-			false, false, true,
-			false, false, true,
-		},
-		{
-			true, true, true,
-			false, false, true,
-			true, true, true,
-			true, false, false,
-			true, true, true,
-		},
-		{
-			true, true, true,
-			false, false, true,
-			true, true, true,
-			false, false, true,
-			true, true, true,
-		},
-		{
-			true, false, true,
-			true, false, true,
-			true, true, true,
-			false, false, true,
-			false, false, true,
-		},
-		{
-			true, true, true,
-			true, false, false,
-			true, true, true,
-			false, false, true,
-			true, true, true,
-		},
-		{
-			true, true, true,
-			true, false, false,
-			true, true, true,
-			true, false, true,
-			true, true, true,
-		},
-		{
-			true, true, true,
-			false, false, true,
-			false, false, true,
-			false, false, true,
-			false, false, true,
-		},
-		{
-			true, true, true,
-			true, false, true,
-			true, true, true,
-			true, false, true,
-			true, true, true,
-		},
-		{
-			true, true, true,
-			true, false, true,
-			true, true, true,
-			false, false, true,
-			true, true, true,
-		},
-	}
-
-	squares := defs[n]
-	for i, draw := range squares {
-		if !draw {
-			continue
-		}
-		x := i % 3
-		y := i / 3
-		drawSquare(scr, xOffset+squareW*x, yOffset+squareH*y, squareW, squareH, style)
-	}
-}
-
-func drawClock(scr tcell.Screen, now time.Time, bgStyle, clockStyle tcell.Style) {
+func drawClock(scr *term.Screen, now time.Time, bgStyle, fgStyle term.Style) {
 	// Clear the entire screen.
-	scr.SetStyle(bgStyle)
-	scr.Clear()
+	scr.Clear(bgStyle)
 
 	// Calculate square width/height and offset.
 	scrW, scrH := scr.Size()
@@ -130,53 +35,33 @@ func drawClock(scr tcell.Screen, now time.Time, bgStyle, clockStyle tcell.Style)
 
 	// Hour
 	hour := now.Hour()
-	drawNumber(scr, hour/10, xOffset+squareW*0, yOffset, squareW, squareH, clockStyle)
-	drawNumber(scr, hour%10, xOffset+squareW*4, yOffset, squareW, squareH, clockStyle)
+	term.DrawNumber(scr, hour/10, xOffset+squareW*0, yOffset, squareW, squareH, fgStyle)
+	term.DrawNumber(scr, hour%10, xOffset+squareW*4, yOffset, squareW, squareH, fgStyle)
 
 	// Colon
-	drawSquare(scr, xOffset+squareW*8, yOffset+squareH*1, squareW, squareH, clockStyle)
-	drawSquare(scr, xOffset+squareW*8, yOffset+squareH*3, squareW, squareH, clockStyle)
+	term.DrawSquare(scr, xOffset+squareW*8, yOffset+squareH*1, squareW, squareH, fgStyle)
+	term.DrawSquare(scr, xOffset+squareW*8, yOffset+squareH*3, squareW, squareH, fgStyle)
 
 	// Minute
 	minute := now.Minute()
-	drawNumber(scr, minute/10, xOffset+squareW*10, yOffset, squareW, squareH, clockStyle)
-	drawNumber(scr, minute%10, xOffset+squareW*14, yOffset, squareW, squareH, clockStyle)
+	term.DrawNumber(scr, minute/10, xOffset+squareW*10, yOffset, squareW, squareH, fgStyle)
+	term.DrawNumber(scr, minute%10, xOffset+squareW*14, yOffset, squareW, squareH, fgStyle)
 }
 
 func cmdClock(cmd *cobra.Command, args []string) {
-	bgStyle := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
-	clockStyle := tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorOlive)
-
-	scr, err := tcell.NewScreen()
+	scr, err := term.NewScreen()
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
-	if err := scr.Init(); err != nil {
-		log.Fatalf("%+v", err)
-	}
-	defer scr.Fini()
+	defer scr.Close()
 
-	drawClock(scr, time.Now(), bgStyle, clockStyle)
+	drawClock(scr, time.Now(), term.BgStyle, term.FgStyle)
 
-	quitC := make(chan struct{})
-
-	go func() {
-		for {
-			scr.Show()
-
-			ev := scr.PollEvent()
-			switch ev := ev.(type) {
-			case *tcell.EventResize:
-				drawClock(scr, time.Now(), bgStyle, clockStyle)
-				scr.Sync()
-			case *tcell.EventKey:
-				if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC || ev.Rune() == 'q' {
-					close(quitC)
-					return
-				}
-			}
-		}
-	}()
+	scr.OnResize(func() bool {
+		drawClock(scr, time.Now(), term.BgStyle, term.FgStyle)
+		return false
+	})
+	go scr.DoEventLoop()
 
 	t := time.NewTicker(1 * time.Second)
 	defer t.Stop()
@@ -184,11 +69,11 @@ func cmdClock(cmd *cobra.Command, args []string) {
 	prev := time.Now()
 	for {
 		select {
-		case <-quitC:
+		case <-scr.QuitC:
 			return
 		case now := <-t.C:
 			if now.Minute() != prev.Minute() {
-				drawClock(scr, now, bgStyle, clockStyle)
+				drawClock(scr, now, term.BgStyle, term.FgStyle)
 				scr.Show()
 				prev = now
 			}

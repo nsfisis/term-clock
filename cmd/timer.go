@@ -4,19 +4,19 @@ import (
 	"log"
 	"time"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/spf13/cobra"
+
+	"github.com/nsfisis/term-clock/internal/term"
 )
 
-func drawTimer(scr tcell.Screen, leftTime time.Duration, bgStyle, clockStyle tcell.Style) {
+func drawTimer(scr *term.Screen, leftTime time.Duration, bgStyle, fgStyle term.Style) {
 	if leftTime<=0{
 		leftTime=0
-		bgStyle, clockStyle = clockStyle, bgStyle
+		bgStyle, fgStyle = fgStyle, bgStyle
 	}
 
 	// Clear the entire screen.
-	scr.SetStyle(bgStyle)
-	scr.Clear()
+	scr.Clear(bgStyle)
 
 	// Calculate square width/height and offset.
 	scrW, scrH := scr.Size()
@@ -40,17 +40,17 @@ func drawTimer(scr tcell.Screen, leftTime time.Duration, bgStyle, clockStyle tce
 
 	// Minute
 	minute := leftTime.Minutes()
-	drawNumber(scr, int(minute)/10, xOffset+squareW*0, yOffset, squareW, squareH, clockStyle)
-	drawNumber(scr, int(minute)%10, xOffset+squareW*4, yOffset, squareW, squareH, clockStyle)
+	term.DrawNumber(scr, int(minute)/10, xOffset+squareW*0, yOffset, squareW, squareH, fgStyle)
+	term.DrawNumber(scr, int(minute)%10, xOffset+squareW*4, yOffset, squareW, squareH, fgStyle)
 
 	// Colon
-	drawSquare(scr, xOffset+squareW*8, yOffset+squareH*1, squareW, squareH, clockStyle)
-	drawSquare(scr, xOffset+squareW*8, yOffset+squareH*3, squareW, squareH, clockStyle)
+	term.DrawSquare(scr, xOffset+squareW*8, yOffset+squareH*1, squareW, squareH, fgStyle)
+	term.DrawSquare(scr, xOffset+squareW*8, yOffset+squareH*3, squareW, squareH, fgStyle)
 
 	// Second
 	second := leftTime.Seconds()
-	drawNumber(scr, int(second)/10, xOffset+squareW*10, yOffset, squareW, squareH, clockStyle)
-	drawNumber(scr, int(second)%10, xOffset+squareW*14, yOffset, squareW, squareH, clockStyle)
+	term.DrawNumber(scr, int(second)/10, xOffset+squareW*10, yOffset, squareW, squareH, fgStyle)
+	term.DrawNumber(scr, int(second)%10, xOffset+squareW*14, yOffset, squareW, squareH, fgStyle)
 }
 
 func cmdTimer(cmd *cobra.Command, args []string) {
@@ -59,51 +59,31 @@ func cmdTimer(cmd *cobra.Command, args []string) {
 	log.Fatalf("%+v", err)
 	}
 
-	bgStyle := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
-	clockStyle := tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorOlive)
-
-	scr, err := tcell.NewScreen()
+	scr, err := term.NewScreen()
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
-	if err := scr.Init(); err != nil {
-		log.Fatalf("%+v", err)
-	}
-	defer scr.Fini()
+	defer scr.Close()
 
 	startTime := time.Now()
 
-	drawTimer(scr, (timerTime - time.Now().Sub(startTime)).Round(time.Second), bgStyle, clockStyle)
+	drawTimer(scr, (timerTime - time.Now().Sub(startTime)).Round(time.Second), term.BgStyle, term.FgStyle)
 
-	quitC := make(chan struct{})
-
-	go func() {
-		for {
-			scr.Show()
-
-			ev := scr.PollEvent()
-			switch ev := ev.(type) {
-			case *tcell.EventResize:
-				drawTimer(scr, (timerTime - time.Now().Sub(startTime)).Round(time.Second), bgStyle, clockStyle)
-				scr.Sync()
-			case *tcell.EventKey:
-				if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC || ev.Rune() == 'q' {
-					close(quitC)
-					return
-				}
-			}
-		}
-	}()
+	scr.OnResize(func() bool {
+		drawTimer(scr, (timerTime - time.Now().Sub(startTime)).Round(time.Second), term.BgStyle, term.FgStyle)
+		return false
+	})
+	go scr.DoEventLoop()
 
 	t := time.NewTicker(1 * time.Second)
 	defer t.Stop()
 
 	for {
 		select {
-		case <-quitC:
+		case <-scr.QuitC:
 			return
 		case now := <-t.C:
-			drawTimer(scr, (timerTime - now.Sub(startTime)).Round(time.Second), bgStyle, clockStyle)
+			drawTimer(scr, (timerTime - now.Sub(startTime)).Round(time.Second), term.BgStyle, term.FgStyle)
 			scr.Show()
 		}
 	}
