@@ -8,10 +8,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func drawTimer(scr tcell.Screen, time time.Duration, elapsed time.Duration, bgStyle, clockStyle tcell.Style) {
-	left := time-elapsed
-	if left<0{
-		left=0
+func drawTimer(scr tcell.Screen, leftTime time.Duration, bgStyle, clockStyle tcell.Style) {
+	if leftTime<=0{
+		leftTime=0
 		bgStyle, clockStyle = clockStyle, bgStyle
 	}
 
@@ -40,7 +39,7 @@ func drawTimer(scr tcell.Screen, time time.Duration, elapsed time.Duration, bgSt
 	yOffset := (scrH - squareH*5) / 2
 
 	// Minute
-	minute := left.Minutes()
+	minute := leftTime.Minutes()
 	drawNumber(scr, int(minute)/10, xOffset+squareW*0, yOffset, squareW, squareH, clockStyle)
 	drawNumber(scr, int(minute)%10, xOffset+squareW*4, yOffset, squareW, squareH, clockStyle)
 
@@ -49,7 +48,7 @@ func drawTimer(scr tcell.Screen, time time.Duration, elapsed time.Duration, bgSt
 	drawSquare(scr, xOffset+squareW*8, yOffset+squareH*3, squareW, squareH, clockStyle)
 
 	// Second
-	second := left.Seconds()
+	second := leftTime.Seconds()
 	drawNumber(scr, int(second)/10, xOffset+squareW*10, yOffset, squareW, squareH, clockStyle)
 	drawNumber(scr, int(second)%10, xOffset+squareW*14, yOffset, squareW, squareH, clockStyle)
 }
@@ -74,7 +73,7 @@ func cmdTimer(cmd *cobra.Command, args []string) {
 
 	startTime := time.Now()
 
-	drawTimer(scr, timerTime, time.Now().Sub(startTime), bgStyle, clockStyle)
+	drawTimer(scr, (timerTime - time.Now().Sub(startTime)).Round(time.Second), bgStyle, clockStyle)
 
 	quitC := make(chan struct{})
 
@@ -85,7 +84,7 @@ func cmdTimer(cmd *cobra.Command, args []string) {
 			ev := scr.PollEvent()
 			switch ev := ev.(type) {
 			case *tcell.EventResize:
-				drawTimer(scr, timerTime, time.Now().Sub(startTime), bgStyle, clockStyle)
+				drawTimer(scr, (timerTime - time.Now().Sub(startTime)).Round(time.Second), bgStyle, clockStyle)
 				scr.Sync()
 			case *tcell.EventKey:
 				if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC || ev.Rune() == 'q' {
@@ -104,7 +103,7 @@ func cmdTimer(cmd *cobra.Command, args []string) {
 		case <-quitC:
 			return
 		case now := <-t.C:
-			drawTimer(scr, timerTime, now.Sub(startTime), bgStyle, clockStyle)
+			drawTimer(scr, (timerTime - now.Sub(startTime)).Round(time.Second), bgStyle, clockStyle)
 			scr.Show()
 		}
 	}
