@@ -7,9 +7,7 @@ run: build
 	./$(BIN)
 
 .PHONY: build
-build: $(BIN)
-
-$(BIN): main.go
+build:
 	go build -o $(BIN)
 
 .PHONY: fmt
