@@ -10,8 +10,8 @@ import (
 )
 
 func drawTimer(scr *term.Screen, leftTime time.Duration, bgStyle, fgStyle term.Style) {
-	if leftTime<=0{
-		leftTime=0
+	if leftTime <= 0 {
+		leftTime = 0
 		bgStyle, fgStyle = fgStyle, bgStyle
 	}
 
@@ -56,7 +56,7 @@ func drawTimer(scr *term.Screen, leftTime time.Duration, bgStyle, fgStyle term.S
 func cmdTimer(cmd *cobra.Command, args []string) {
 	timerTime, err := time.ParseDuration(args[0])
 	if err != nil {
-	log.Fatalf("%+v", err)
+		log.Fatalf("%+v", err)
 	}
 
 	scr, err := term.NewScreen()
@@ -89,9 +89,9 @@ func cmdTimer(cmd *cobra.Command, args []string) {
 	}
 }
 
-var timerCmd =&cobra.Command{
-	Use: "timer",
+var timerCmd = &cobra.Command{
+	Use:   "timer",
 	Short: "Timer mode",
-	Run: cmdTimer,
-	Args: cobra.ExactArgs(1),
+	Run:   cmdTimer,
+	Args:  cobra.ExactArgs(1),
 }

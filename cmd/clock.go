@@ -81,8 +81,8 @@ func cmdClock(cmd *cobra.Command, args []string) {
 	}
 }
 
-var clockCmd =&cobra.Command{
-	Use: "clock",
+var clockCmd = &cobra.Command{
+	Use:   "clock",
 	Short: "Clock mode",
-	Run: cmdClock,
+	Run:   cmdClock,
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-type Style tcell.Style;
+type Style tcell.Style
 
 var (
 	BgStyle Style

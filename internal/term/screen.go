@@ -5,22 +5,22 @@ import (
 )
 
 type Screen struct {
-	scr tcell.Screen
+	scr      tcell.Screen
 	onResize func() bool
-	QuitC chan struct{}
+	QuitC    chan struct{}
 }
 
 func NewScreen() (*Screen, error) {
 	scr, err := tcell.NewScreen()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	err = scr.Init()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	return &Screen{
-		scr: scr,
+		scr:   scr,
 		QuitC: make(chan struct{}),
 	}, nil
 }
