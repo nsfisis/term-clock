@@ -21,18 +21,18 @@ func drawTimer(scr *term.Screen, leftTime time.Duration, bgStyle, fgStyle term.S
 	squareW, squareH, xOffset, yOffset := calcSquareSize(scr)
 
 	// Minute
-	minute := leftTime.Minutes()
-	term.DrawNumber(scr, int(minute)/10, xOffset+squareW*0, yOffset, squareW, squareH, fgStyle)
-	term.DrawNumber(scr, int(minute)%10, xOffset+squareW*4, yOffset, squareW, squareH, fgStyle)
+	minute := int(leftTime.Minutes())
+	term.DrawNumber(scr, minute/10, xOffset+squareW*0, yOffset, squareW, squareH, fgStyle)
+	term.DrawNumber(scr, minute%10, xOffset+squareW*4, yOffset, squareW, squareH, fgStyle)
 
 	// Colon
 	term.DrawSquare(scr, xOffset+squareW*8, yOffset+squareH*1, squareW, squareH, fgStyle)
 	term.DrawSquare(scr, xOffset+squareW*8, yOffset+squareH*3, squareW, squareH, fgStyle)
 
 	// Second
-	second := leftTime.Seconds()
-	term.DrawNumber(scr, int(second)/10, xOffset+squareW*10, yOffset, squareW, squareH, fgStyle)
-	term.DrawNumber(scr, int(second)%10, xOffset+squareW*14, yOffset, squareW, squareH, fgStyle)
+	second := int(leftTime.Seconds()) % 60
+	term.DrawNumber(scr, second/10, xOffset+squareW*10, yOffset, squareW, squareH, fgStyle)
+	term.DrawNumber(scr, second%10, xOffset+squareW*14, yOffset, squareW, squareH, fgStyle)
 }
 
 func cmdTimer(cmd *cobra.Command, args []string) {
