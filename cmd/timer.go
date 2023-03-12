@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -39,6 +40,11 @@ func cmdTimer(cmd *cobra.Command, args []string) {
 	timerTime, err := time.ParseDuration(args[0])
 	if err != nil {
 		log.Fatalf("%+v", err)
+	}
+
+	if timerTime.Minutes() > 60 {
+		fmt.Println("Duration over 1 hour is not supported.")
+		return
 	}
 
 	scr, err := term.NewScreen()
