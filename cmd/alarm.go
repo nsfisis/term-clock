@@ -35,7 +35,7 @@ func cmdAlarm(cmd *cobra.Command, args []string) {
 	drawAlarm(scr, time.Now(), alarmTime, term.BgStyle, term.FgStyle)
 
 	scr.OnResize(func() bool {
-	drawAlarm(scr, time.Now(), alarmTime, term.BgStyle, term.FgStyle)
+		drawAlarm(scr, time.Now(), alarmTime, term.BgStyle, term.FgStyle)
 		return false
 	})
 	go scr.DoEventLoop()
@@ -48,7 +48,7 @@ func cmdAlarm(cmd *cobra.Command, args []string) {
 		case <-scr.QuitC:
 			return
 		case now := <-t.C:
-	drawAlarm(scr, now, alarmTime, term.BgStyle, term.FgStyle)
+			drawAlarm(scr, now, alarmTime, term.BgStyle, term.FgStyle)
 			scr.Show()
 		}
 	}
