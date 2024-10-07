@@ -13,7 +13,7 @@ func drawAlarm(scr *term.Screen, now time.Time, alarmTime time.Time, bgStyle, fg
 	h1, m1, s1 := now.Clock()
 	h2, m2, s2 := alarmTime.Clock()
 
-	if h1*3600+m1*60+s1 >= h2*3600+m2*60+s2 {
+	if h1*3600+m1*60+s1 >= h2*3600+m2*60+s2 && s1%2 == 0 {
 		bgStyle, fgStyle = fgStyle, bgStyle
 	}
 
