@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"math"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -12,8 +13,10 @@ import (
 
 func drawTimer(scr *term.Screen, leftTime time.Duration, bgStyle, fgStyle term.Style) {
 	if leftTime <= 0 {
+		if int(math.Abs(leftTime.Seconds()))%2 == 0 {
+			bgStyle, fgStyle = fgStyle, bgStyle
+		}
 		leftTime = 0
-		bgStyle, fgStyle = fgStyle, bgStyle
 	}
 
 	// Clear the entire screen.
