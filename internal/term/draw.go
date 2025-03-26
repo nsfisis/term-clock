@@ -12,7 +12,7 @@ var (
 )
 
 func init() {
-	BgStyle = Style(tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset))
+	BgStyle = Style(tcell.StyleDefault.Foreground(tcell.ColorReset).Background(tcell.ColorReset))
 	FgStyle = Style(tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorOlive))
 }
 

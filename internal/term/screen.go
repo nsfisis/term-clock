@@ -34,8 +34,7 @@ func (scr *Screen) Size() (int, int) {
 }
 
 func (scr *Screen) Clear(style Style) {
-	scr.scr.SetStyle(tcell.Style(style))
-	scr.scr.Clear()
+	scr.scr.Fill(' ', tcell.Style(style))
 }
 
 func (scr *Screen) OnResize(handler func() bool) {
