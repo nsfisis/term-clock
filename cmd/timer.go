@@ -45,8 +45,8 @@ func cmdTimer(cmd *cobra.Command, args []string) {
 		log.Fatalf("%+v", err)
 	}
 
-	if timerTime.Minutes() > 60 {
-		fmt.Println("Duration over 1 hour is not supported.")
+	if timerTime.Minutes() > 99 {
+		fmt.Println("Duration over 99 minutes is not supported.")
 		return
 	}
 
