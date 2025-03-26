@@ -17,9 +17,9 @@ func init() {
 }
 
 func DrawSquare(scr *Screen, xOffset, yOffset, w, h int, style Style) {
-	for dx := 0; dx < w; dx++ {
+	for dx := range w {
 		x := xOffset + dx
-		for dy := 0; dy < h; dy++ {
+		for dy := range h {
 			y := yOffset + dy
 			scr.scr.SetContent(x, y, ' ', nil, tcell.Style(style))
 		}
