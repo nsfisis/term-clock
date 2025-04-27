@@ -11,7 +11,7 @@ A digital clock that runs in your terminal, providing clock, alarm and timer.
 ## Installation
 
 ```bash
-go install github.com/nsfisis/term-clock@latest
+$ go install github.com/nsfisis/term-clock@latest
 ```
 
 ## Usage
@@ -21,7 +21,13 @@ go install github.com/nsfisis/term-clock@latest
 Displays the current time in digital format.
 
 ```bash
-term-clock clock
+$ term-clock clock
+```
+
+or
+
+```bash
+$ term-clock
 ```
 
 ### Alarm Mode
@@ -29,7 +35,7 @@ term-clock clock
 The screen flashes when the specified time is reached. Time should be specified in 24-hour format (HH:MM).
 
 ```bash
-term-clock alarm 07:00  # Alarm at 7:00 AM
+$ term-clock alarm 07:00  # Alarm at 7:00 AM
 ```
 
 ### Timer Mode
@@ -38,9 +44,9 @@ Counts down from the specified duration. Time should be specified using Go's dur
 The screen flashes when the timer ends.
 
 ```bash
-term-clock timer 25m    # 25-minute timer
-term-clock timer 90s    # 90-second timer
-term-clock timer 1h30m  # 1 hour 30 minutes timer (note: maximum 99 minutes)
+$ term-clock timer 25m    # 25-minute timer
+$ term-clock timer 90s    # 90-second timer
+$ term-clock timer 1h30m  # 1 hour 30 minutes timer (note: maximum 99 minutes)
 ```
 
 ## How to Exit

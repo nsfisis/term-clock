@@ -7,6 +7,10 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "term-clock",
 	Short: "A clock on your terminal",
+	// Run 'clock' subcommand by default.
+	Run: func(cmd *cobra.Command, args []string) {
+		clockCmd.Run(cmd, args)
+	},
 }
 
 func init() {
