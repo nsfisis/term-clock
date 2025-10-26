@@ -4,9 +4,10 @@ A digital clock that runs in your terminal, providing clock, alarm and timer.
 
 ## Features
 
-- **Clock Mode**: Digital display of current time (24-hour format)
-- **Alarm Mode**: Screen flashes at the specified time
-- **Timer Mode**: Countdown timer (up to 99 minutes)
+- Clock Mode: Digital display of current time (24-hour format)
+- Alarm Mode: Screen flashes at the specified time
+- Timer Mode: Countdown timer (up to 99 minutes)
+- Countdown Mode: Countdown from a specified duration to zero
 
 ## Installation
 
@@ -48,6 +49,19 @@ $ term-clock timer 25m    # 25-minute timer
 $ term-clock timer 90s    # 90-second timer
 $ term-clock timer 1h30m  # 1 hour 30 minutes timer (note: maximum 99 minutes)
 ```
+
+### Countdown Mode
+
+Counts down from the specified number of seconds to zero, displaying the remaining seconds.
+The screen flashes when the countdown reaches zero.
+
+```bash
+$ term-clock countdown 10    # Countdown from 10 seconds
+$ term-clock countdown 600   # Countdown from 600 seconds
+$ term-clock countdown 9999  # Countdown from 9999 seconds
+```
+
+Note: Maximum supported duration is 9999 seconds.
 
 ## How to Exit
 

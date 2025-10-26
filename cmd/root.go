@@ -16,6 +16,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(alarmCmd)
 	rootCmd.AddCommand(clockCmd)
+	rootCmd.AddCommand(countdownCmd)
 	rootCmd.AddCommand(timerCmd)
 }
 
