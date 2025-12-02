@@ -1,0 +1,5 @@
+How to generate assets/ files:
+
+$ nix run 'nixpkgs#vhs' tools/vhs/[FILE].tape
+
+See also: https://github.com/charmbracelet/vhs
