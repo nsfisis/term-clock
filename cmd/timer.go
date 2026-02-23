@@ -58,10 +58,10 @@ func cmdTimer(cmd *cobra.Command, args []string) {
 
 	startTime := time.Now()
 
-	drawTimer(scr, (timerTime - time.Now().Sub(startTime)).Round(time.Second), term.BgStyle, term.FgStyle)
+	drawTimer(scr, (timerTime - time.Since(startTime)).Round(time.Second), term.BgStyle, term.FgStyle)
 
 	scr.OnResize(func() bool {
-		drawTimer(scr, (timerTime - time.Now().Sub(startTime)).Round(time.Second), term.BgStyle, term.FgStyle)
+		drawTimer(scr, (timerTime - time.Since(startTime)).Round(time.Second), term.BgStyle, term.FgStyle)
 		return false
 	})
 	go scr.DoEventLoop()

@@ -15,10 +15,7 @@ func calcSquareSize(scr *term.Screen) (int, int, int, int) {
 	// # # # # # # # # # |
 	// ### ###   ### ### v
 	squareW := scrW / (17 + 2)
-	squareH := scrH / (5 + 2)
-	if squareH > squareW {
-		squareH = squareW
-	}
+	squareH := min(scrH/(5+2), squareW)
 	if squareW > squareH*3/2 {
 		squareW = squareH * 3 / 2
 	}
